@@ -9,6 +9,7 @@ TODO: Scrape through each of the items whether hourly or in minutes
     Populate with images, pretend to click on zoom and found out how to get images to populate the app
     overall results will have the amount you have left in your budget. 
     Time out the success notification
+    Selenium can be used to get images, use Safari Webdriver for now
 
 '''
 
@@ -86,6 +87,7 @@ class Scraper:
                 return 'You cannot buy this, you went over the budget<br>'
         else:
             return "{} is not available. <br>".format(title)
+        
             
 
     def get_outcome(self,link):

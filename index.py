@@ -8,8 +8,7 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-# UPDATES NEEDED HERE
-@app.route('/scanProducts', methods=['GET', 'POST'])
+@app.route('/scanProducts', methods=['POST'])
 def scan():
     results = {}
     if request.method == 'POST':
@@ -23,10 +22,20 @@ def scan():
         scraper.set_limit(budget)
 
         for key,value in obj.items():
-            result = scraper.get_outcome(value)
-            results[key] =result
+            result = scraper.get_purchase_outcome(value)
+            if 'Oops sorry' not in result:
+                results[key] =result
+                product_image = scraper.get_product_image(value)
+            else:
+                results[key] =result
+                break
+
+        scraper.quit_driver()
         return json.dumps(results)
-    
+
+@app.route('/overallResults',methods=['GET'])
+def overall():
+    pass
    
 
 if __name__ == '__main__':

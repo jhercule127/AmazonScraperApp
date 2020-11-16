@@ -37,11 +37,11 @@ function getResults() {
     let sendData = JSON.stringify(data);
     document.getElementById("budget").value = "";
     document.getElementById("products").value = "";
-    ajaxPostRequest("/scanProducts", sendData, postResults);
+    ajaxPostRequest("/scanProducts", sendData, postQuickResults);
 }
 
 // WORK ON THIS PART TO FILL RESULTS AFTER RUNNING THE SCRAPER
-function postResults(jsonData) {
+function postQuickResults(jsonData) {
     try {
         let response = JSON.parse(jsonData);
         let result = "";
@@ -51,13 +51,17 @@ function postResults(jsonData) {
                 result += response[key];
             }
         }
+
         document.getElementById("results").innerHTML = result;
         document.getElementById("response").innerHTML = '<div class="alert alert-success" role="alert"><strong>Successful!</strong>, see your results below. Extract them to a CSV file as an option.</div>';
+        setTimeout(() =>{ document.getElementById("response").remove(); },7000)
     } catch (e) {
         document.getElementById("response").innerHTML = '<div class="alert alert-warning" role="alert">Unsuccessful</div>';
     }
+
+    //ajaxGetRequest('/overallResults',postOverallResults)
+}
+
+function postOverallResults(jsonData) {
     
-
-
-
 }

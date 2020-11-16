@@ -8,7 +8,6 @@ TODO: Scrape through each of the items whether hourly or in minutes
     UPDATE:
     Populate with images, pretend to click on zoom and found out how to get images to populate the app
     overall results will have the amount you have left in your budget. 
-    Time out the success notification
     Selenium can be used to get images, use Safari Webdriver for now
 
 '''
@@ -19,18 +18,17 @@ import requests
 import csv
 import argparse
 
-driver = webdriver.Safari()
-
-
+'''
 HEADERS = ({'User-Agent':
             'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
             'Accept-Language': 'en-US, en;q=0.5'})
-
+'''
 class Scraper:
 
     def __init__(self):
         self.limit = 0
         self.products = {}
+        self.driver = webdriver.Safari()
 
     def reset(self):
         self.limit = 0
@@ -41,11 +39,12 @@ class Scraper:
 
     def set_limit(self,x):
         self.limit = x
+    
 
     def get_purchase_outcome(self,url):
-        response = requests.get(url,headers=HEADERS)
-        driver.get(url)
-        soup = BeautifulSoup(driver.page_source, 'lxml')
+        #response = requests.get(url,headers=HEADERS)
+        self.driver.get(url)
+        soup = BeautifulSoup(self.driver.page_source, 'lxml')
         
         try:
             soup.select('#availability .a-color-state')[0].text.strip()
@@ -82,20 +81,36 @@ class Scraper:
             if self.limit > 0 and price < self.limit:
                 self.limit-=price
                 self.products[title] = price
-                return "The {} is available and fits your budget. <br> This item is ${}<br>".format(title,price)
+                return "The {} is available and is ${}<br>".format(title,price)
             else:
-                return 'You cannot buy this, you went over the budget<br>'
+                return '<strong>Oops sorry! </strong> You went over your budget<br>'
         else:
             return "{} is not available. <br>".format(title)
-        
-            
 
-    def get_outcome(self,link):
-        return self.get_purchase_outcome(link)
+
+    def get_product_image(self,url):
+        soup = BeautifulSoup(self.driver.page_source, 'lxml')
+        product = soup.find(id="imgTagWrapperId")
+        return product.img['src']
     
+
+    def overall(self):
+        final = "You are able to buy the following items: <br>"
+        items = ""
+        try:
+            for key in self.products.keys():
+                items = items + key + "<br>"
+        except KeyError:
+            pass
+        return final + items
+
+
     def extract_to_CSV(self):
         results = open("results.csv",'w')
         results_writer = csv.writer(results)
         results_writer.writerow(["Title","Price (US Dollars)"])
         for key,value in self.products.items():
             results_writer.writerow([key,value])
+    
+    def quit_driver(self):
+        self.driver.quit()

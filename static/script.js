@@ -59,9 +59,30 @@ function postQuickResults(jsonData) {
         document.getElementById("response").innerHTML = '<div class="alert alert-warning" role="alert">Unsuccessful</div>';
     }
 
-    //ajaxGetRequest('/overallResults',postOverallResults)
+    ajaxGetRequest('/overallResult',postOverallResults);
+    ajaxGetRequest('/getProductsInfo',postExtractProducts);
 }
 
 function postOverallResults(jsonData) {
-    
+    try {
+        let response = JSON.parse(jsonData);
+        let names = response['names'];
+        let final_budget = response['final_budget'];
+        document.getElementById('overall_result').innerHTML = names;
+        document.getElementById('overall_budget').innerHTML = "You're left with $" + final_budget.toString();
+        
+    } catch (error) {
+        document.getElementById("response").innerHTML = '<div class="alert alert-warning" role="alert">Unsuccessful</div>';
+    }
+}
+
+function postExtractProducts(jsonData) {
+    let response = JSON.parse(jsonData);
+    for (var key in response) {
+        if (response.hasOwnProperty(key)) {
+            resp_array = response[key]
+        }
+    }
+
+
 }

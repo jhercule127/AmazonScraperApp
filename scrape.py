@@ -8,7 +8,14 @@ TODO: Scrape through each of the items whether hourly or in minutes
     UPDATE:
     Populate with images, pretend to click on zoom and found out how to get images to populate the app
     overall results will have the amount you have left in your budget. 
+
+    Use these resources: https://stackoverflow.com/questions/54868328/html-how-to-automatically-create-bootstrap-cards-from-a-js-file
+    https://getbootstrap.com/docs/4.0/components/card/
+    To create the cards with images or whatever tag you want
+        - idea create a card-deck in html and fill up with cards
+        
     Selenium can be used to get images, use Safari Webdriver for now
+
 
 '''
 
@@ -28,7 +35,7 @@ class Scraper:
     def __init__(self):
         self.limit = 0
         self.products = {}
-        self.driver = webdriver.Safari()
+        self.driver = None
 
     def reset(self):
         self.limit = 0
@@ -37,9 +44,15 @@ class Scraper:
     def get_limit(self):
         return self.limit
 
+    def get_products(self):
+        return self.products
+
     def set_limit(self,x):
         self.limit = x
     
+    def set_driver(self):
+        self.driver = webdriver.Safari()
+
 
     def get_purchase_outcome(self,url):
         #response = requests.get(url,headers=HEADERS)
@@ -66,7 +79,7 @@ class Scraper:
                 try:
                     price = float(soup.find(id='priceblock_saleprice').text.replace('$','').replace(',','').strip())
                 except:
-                    price = ''
+                    return "Could not extract the price for {}".format(title)
             try:
                 review_score = float(soup.select('i[class*="a-icon a-icon-star a-star-5"]')[0].text.split(' ')[0])
                 review_count = int(soup.select('#acrCustomerReviewText')[0].text.split(' ')[0].replace(",", ""))
@@ -77,10 +90,11 @@ class Scraper:
                 except:
                     review_score = ''
                     review_count = ''
-        
+            
             if self.limit > 0 and price < self.limit:
+                image = self.get_product_image()
                 self.limit-=price
-                self.products[title] = price
+                self.products[title] = [price,image]
                 return "The {} is available and is ${}<br>".format(title,price)
             else:
                 return '<strong>Oops sorry! </strong> You went over your budget<br>'
@@ -88,21 +102,20 @@ class Scraper:
             return "{} is not available. <br>".format(title)
 
 
-    def get_product_image(self,url):
+    def get_product_image(self):
         soup = BeautifulSoup(self.driver.page_source, 'lxml')
         product = soup.find(id="imgTagWrapperId")
         return product.img['src']
     
 
-    def overall(self):
-        final = "You are able to buy the following items: <br>"
+    def get_product_names(self):
         items = ""
         try:
             for key in self.products.keys():
                 items = items + key + "<br>"
         except KeyError:
             pass
-        return final + items
+        return items
 
 
     def extract_to_CSV(self):

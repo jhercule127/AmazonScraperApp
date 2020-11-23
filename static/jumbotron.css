@@ -1,0 +1,13 @@
+
+/* Heading for Output */
+#overall_list {
+    visibility: hidden;
+}
+
+#csv_button {
+    visibility: hidden;
+}
+
+.card {
+    display: inline-block;
+}

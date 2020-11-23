@@ -30,7 +30,7 @@
       <!-- Main jumbotron for a primary marketing message or call to action -->
       <div class="jumbotron">
         <div class="container">
-          <h1 class="display-3" style="color: salmon;">Amazon Web Scraper</h1>
+          <h1 class="display-3" style="color: salmon;">Lets Get Started!</h1>
           <p>This is a web scraper that looks at the budget you have and recommends which items
             you can buy that fit your budget. The list of products are the ones you would like to
             purchase. The products must be in purchased with US dollars as the scraper at this time
@@ -67,7 +67,7 @@
               </div>
             </div>
             <br>
-            <p><a class="btn btn-secondary" href="#" role="button">Export to CSV file »</a></p>
+            <p><a class="btn btn-secondary" id="csv_button"role="button" href="{{ url_for('csv') }}">Export to CSV file »</a></p>
           </div>
         </div>
 
@@ -77,46 +77,22 @@
 
       <div class="container">
         <div class="row">
-          <div class="col-md-8">
-            <h3>You are able to buy the following items: </h3><br>
+          <div class="col-md-12">
             <div class="overall">
-              <div id="overall_result"></div>
               <div id="overall_budget"></div>
             </div>
+            <h5 id="overall_list">You are able to buy the following items: </h5><br>
           </div>
         </div>
       </div>
       
     <div class="container">
-      <div class="card-group">
-        <div class="card">
-          <img class="card-img-top" src="..." alt="Card image cap">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-          </div>
-        </div>
-        <div class="card">
-          <img class="card-img-top" src="..." alt="Card image cap">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
-            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-          </div>
-        </div>
-        <div class="card">
-          <img class="card-img-top" src="..." alt="Card image cap">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
-            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-          </div>
-        </div>
+      <div class="card-columns" id="card-container"> 
+
       </div>
-
+      <button type="button" class="btn btn-outline-primary" style="float: right;" > Reset</button>
     </div>
-
+    
     </main>
 
 

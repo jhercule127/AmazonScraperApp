@@ -13,7 +13,12 @@ TODO: Scrape through each of the items whether hourly or in minutes
     https://getbootstrap.com/docs/4.0/components/card/
     To create the cards with images or whatever tag you want
         - idea create a card-deck in html and fill up with cards
-        
+    
+    Try adding 4-5 items
+    Work on CSV file extraction - send_file put into a folder and get file to download
+    Add reset button to reset everything 
+    Disable extract to CSV file button
+
     Selenium can be used to get images, use Safari Webdriver for now
 
 
@@ -24,7 +29,7 @@ from selenium import webdriver
 import requests
 import csv
 import argparse
-
+import io
 '''
 HEADERS = ({'User-Agent':
             'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
@@ -94,7 +99,7 @@ class Scraper:
             if self.limit > 0 and price < self.limit:
                 image = self.get_product_image()
                 self.limit-=price
-                self.products[title] = [price,image]
+                self.products[title] = [price,image,url]
                 return "The {} is available and is ${}<br>".format(title,price)
             else:
                 return '<strong>Oops sorry! </strong> You went over your budget<br>'
@@ -119,11 +124,12 @@ class Scraper:
 
 
     def extract_to_CSV(self):
-        results = open("results.csv",'w')
-        results_writer = csv.writer(results)
+        si = io.StringIO()
+        results_writer = csv.writer(si)
         results_writer.writerow(["Title","Price (US Dollars)"])
         for key,value in self.products.items():
-            results_writer.writerow([key,value])
-    
+            results_writer.writerow([key,value[0]])
+        return si
+
     def quit_driver(self):
         self.driver.quit()

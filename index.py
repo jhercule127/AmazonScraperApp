@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, Response, make_response
 from scrape import Scraper
 import json
 app = Flask(__name__)
@@ -35,9 +35,8 @@ def scan():
 
 @app.route('/overallResult',methods=['GET'])
 def overall():
-    names = scraper.get_product_names()
     final_budget = scraper.get_limit()
-    results = {'names':names,'final_budget':final_budget}
+    results = {'final_budget':final_budget}
     return json.dumps(results)
    
 @app.route('/getProductsInfo',methods=['GET'])
@@ -47,6 +46,14 @@ def get_info():
         return
     else:
         return json.dumps(info)
+
+@app.route('/getCSVFile',methods=['GET'])
+def csv():
+    file = scraper.extract_to_CSV()
+    output = make_response(file.getvalue())
+    output.headers["Content-Disposition"] = "attachment; filename=results.csv"
+    output.headers["Content-type"] = "text/csv"
+    return output
 
 if __name__ == '__main__':
   app.run(host='127.0.0.1', port=8000, debug=True)

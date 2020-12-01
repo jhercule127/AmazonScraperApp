@@ -11,25 +11,29 @@ TODO: Scrape through each of the items whether hourly or in minutes
 
     Use these resources: https://stackoverflow.com/questions/54868328/html-how-to-automatically-create-bootstrap-cards-from-a-js-file
     https://getbootstrap.com/docs/4.0/components/card/
-    To create the cards with images or whatever tag you want
-        - idea create a card-deck in html and fill up with cards
     
-    Try adding 4-5 items
-    Work on CSV file extraction - send_file put into a folder and get file to download
-    Add reset button to reset everything 
-    Disable extract to CSV file button
+    Fix when trying to get products again
 
-    Selenium can be used to get images, use Safari Webdriver for now
+    Fix error handling and some things in javascript
+       - a bit more of error handling
+
+    Fix buttons
+        Form button works correctly
+        Reset too, but change how to select
+    Change how to select stuff using query selector or whatever is appropiate
+
 
 
 '''
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from urllib.request import urlparse
 import requests
 import csv
 import argparse
 import io
+
 '''
 HEADERS = ({'User-Agent':
             'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
@@ -45,6 +49,10 @@ class Scraper:
     def reset(self):
         self.limit = 0
         self.products = {}
+        if self.limit or self.products:
+            return False
+        else:
+            return True
 
     def get_limit(self):
         return self.limit
@@ -58,9 +66,14 @@ class Scraper:
     def set_driver(self):
         self.driver = webdriver.Safari()
 
+    def is_valid(self,url):
+        parsed = urlparse(url)
+        return bool(parsed.netloc) and bool(parsed.scheme) and ('www.amazon.com' == parsed.netloc)
+
 
     def get_purchase_outcome(self,url):
         #response = requests.get(url,headers=HEADERS)
+        
         self.driver.get(url)
         soup = BeautifulSoup(self.driver.page_source, 'lxml')
         
@@ -75,6 +88,7 @@ class Scraper:
             except:
                 available = 1
         title = soup.find('span',id='productTitle').text.strip()
+
         if available:
             
             try:
@@ -85,26 +99,26 @@ class Scraper:
                     price = float(soup.find(id='priceblock_saleprice').text.replace('$','').replace(',','').strip())
                 except:
                     return "Could not extract the price for {}".format(title)
+
             try:
-                review_score = float(soup.select('i[class*="a-icon a-icon-star a-star-5"]')[0].text.split(' ')[0])
-                review_count = int(soup.select('#acrCustomerReviewText')[0].text.split(' ')[0].replace(",", ""))
+                review_score = float(soup.select('span[class*="a-size-medium a-color-base"]')[0].text.split(' ')[0])
             except:
                 try:
                     review_score = float(soup.select('i[class*="a-icon a-icon-star a-star-5"]')[1].text.split(' ')[0])
-                    review_count = int(soup.select('#acrCustomerReviewText')[0].text.split(' ')[0].replace(",", ""))
                 except:
                     review_score = ''
-                    review_count = ''
-            
+
+
             if self.limit > 0 and price < self.limit:
                 image = self.get_product_image()
                 self.limit-=price
-                self.products[title] = [price,image,url]
+                self.products[title] = [price,image,url,review_score]
                 return "The {} is available and is ${}<br>".format(title,price)
             else:
                 return '<strong>Oops sorry! </strong> You went over your budget<br>'
         else:
             return "{} is not available. <br>".format(title)
+
 
 
     def get_product_image(self):
@@ -123,6 +137,7 @@ class Scraper:
         return items
 
 
+
     def extract_to_CSV(self):
         si = io.StringIO()
         results_writer = csv.writer(si)
@@ -131,5 +146,8 @@ class Scraper:
             results_writer.writerow([key,value[0]])
         return si
 
+
+
     def quit_driver(self):
         self.driver.quit()
+        

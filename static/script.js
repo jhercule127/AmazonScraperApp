@@ -22,7 +22,13 @@ function ajaxPostRequest(path, data, callback) {
     request.send(data);
 }
 
-function createCard(name,image,url){
+
+
+function createCard(name,product){
+    image = product[1];
+    url = product[2];
+    review_score = product[3];
+
     let card = document.createElement('div');
     card.className = 'card';
 
@@ -40,7 +46,7 @@ function createCard(name,image,url){
 
     let short_text = document.createElement('p');
     short_text.className = 'card-text';
-    short_text.innerText = "You are able to purchase this item. Feel free to explore other items.";
+    short_text.innerText = "You are able to purchase this item. Product score is " + review_score.toString();
 
     let link = document.createElement('a');
     link.className = 'btn btn-primary';
@@ -57,8 +63,8 @@ function createCard(name,image,url){
 
 // NEED TO UPDATE THIS
 function getResults() {
-    let budget = document.getElementById("budget").value
-    let arrayproducts = document.getElementById("products").value.split('\n');
+    let budget = document.querySelector("#budget").value
+    let arrayproducts = document.querySelector("#products").value.split('\n');
 
 
     let data = { "budget": budget };
@@ -68,45 +74,57 @@ function getResults() {
     });
 
     let sendData = JSON.stringify(data);
-    document.getElementById("budget").value = "";
-    document.getElementById("products").value = "";
+    document.querySelector("#budget").value = "";
+    document.querySelector("#products").value = "";
     ajaxPostRequest("/scanProducts", sendData, postQuickResults);
 }
 
 
+
 // WORK ON THIS PART TO FILL RESULTS AFTER RUNNING THE SCRAPER
 function postQuickResults(jsonData) {
-    try {
-        let response = JSON.parse(jsonData);
-        let result = "";
 
+    
+    let response = JSON.parse(jsonData);
+    if (response['resp'] == 'error'){
+        document.querySelector("#response").innerHTML = '<div class="alert alert-danger" role="alert"><strong>Unsuccessful</strong> Try Again!</div>';
+        reset_app()
+        setTimeout(() =>{ document.querySelector("#response").innerHTML =''; },4000)
+    }
+
+    else{
+        delete response['resp'];
+        let result = "";
         for (var key in response) {
             if (response.hasOwnProperty(key)) {
                 result += response[key];
             }
         }
-        document.getElementById("response").innerHTML = '<div class="alert alert-success" role="alert"><strong>Successful!</strong>, see your results below. Extract them to a CSV file as an option.</div>';
-        document.getElementById("results").innerHTML = result;
-        document.getElementById('csv_button').style.visibility = 'visible';
-        setTimeout(() =>{ document.getElementById("response").remove(); },7000)
-    } catch (e) {
-        document.getElementById("response").innerHTML = '<div class="alert alert-warning" role="alert">Unsuccessful</div>';
-    }
+        document.querySelector("#response").innerHTML = '<div class="alert alert-success alert-dismissible fade show" role="alert">' + 
+        '<strong>Successful!</strong>, see your results below. Extract them to a CSV file as an option.' +
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button> </div> ';
 
-    ajaxGetRequest('/overallResult',postOverallResults);
-    ajaxGetRequest('/getProductsInfo',postExtractProducts);
+        document.querySelector("#results").innerHTML = result;
+        document.querySelector('#csv_button').style.visibility = 'visible';
+        //setTimeout(() =>{ document.querySelector("#response").innerHTML =''; },4000)
+    
+
+        ajaxGetRequest('/overallResult',postOverallResults);
+        ajaxGetRequest('/getProductsInfo',postExtractProducts);
+    }
 }
+
+
 
 function postOverallResults(jsonData) {
-    try {
-        let response = JSON.parse(jsonData);
-        let final_budget = response['final_budget'];
-        document.getElementById('overall_budget').innerHTML = "<h4>After determining the available products you can buy, you're left with $" + final_budget.toString() + "</h4>";
-        document.getElementById('overall_list').style.visibility = 'visible';
-    } catch (error) {
-        document.getElementById("response").innerHTML = '<div class="alert alert-warning" role="alert">Unsuccessful</div>';
-    }
+   
+    let response = JSON.parse(jsonData);
+    let final_budget = response['final_budget'];
+    document.querySelector('#overall_budget').innerHTML = "<h4>After determining the available product(s) you can buy, you're left with $" + final_budget.toString() + "</h4>";
+    document.querySelector('#overall_list').style.visibility = 'visible';
+
 }
+
 
 function postExtractProducts(jsonData) {
     let response = JSON.parse(jsonData);
@@ -114,14 +132,44 @@ function postExtractProducts(jsonData) {
     for (var key in response) {
         if (response.hasOwnProperty(key)) {
             resp_array = response[key];
-            image = resp_array[1];
-            url = resp_array[2];
-            card = createCard(key,image,url);
-            document.getElementById('card-container').appendChild(card);
+            card = createCard(key,resp_array);
+            document.querySelector('.card-columns').appendChild(card);
         }
-
-
     }
+    document.querySelector('#reset_app').disabled = false;
+   
+}
 
+
+function reset_app() {
+    ajaxGetRequest('/reset_app',function (jsonData) {
+        let response = JSON.parse(jsonData);
+        let outcome = response['outcome'];
+        if (outcome){
+            /* Remove Quick Results */
+            document.querySelector('#results').innerHTML = '';
+            document.querySelector('#csv_button').style.visibility = 'hidden';
+            }
+
+            /* Remove Overall Results and Cards  */
+            document.querySelector('#overall_budget').innerHTML = '';
+            document.querySelector('#overall_list').style.visibility = 'hidden';
+            document.querySelector('.card-columns').innerHTML = '';
+
+            /* Put disable attribute on reset button */
+            document.querySelector('#reset_app').disabled = true
+            
+        }
+    )
 
 }
+
+
+window.addEventListener('load',function () {
+    const form = document.querySelector('#submit');
+    form.addEventListener('submit',function (event) {
+        event.preventDefault();
+        getResults();
+    });
+});
+

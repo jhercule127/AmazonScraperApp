@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, Response, make_response
+from flask import Flask, render_template, request, make_response
 from scrape import Scraper
 import json
 app = Flask(__name__)
@@ -10,8 +10,8 @@ def index():
     return render_template('index.html')
 
 @app.route('/scanProducts', methods=['POST'])
-def scan():
-    scraper.set_driver()
+def crawl():
+
     results = {}
     if request.method == 'POST':
         
@@ -22,14 +22,20 @@ def scan():
         del obj['budget']
         scraper.set_limit(budget)
 
-        for key,value in obj.items():
-            result = scraper.get_purchase_outcome(value)
-            if 'Oops sorry' not in result:
-                results[key] =result
-            else:
-                results[key] =result
-                break
+        validation = all([scraper.is_valid(value) for key,value in obj.items()])
+        if validation:
+            scraper.set_driver()
+            for key,value in obj.items():
+                result = scraper.get_purchase_outcome(value)
+                if 'Oops sorry' not in result:
+                    results[key] =result
+                else:
+                    results[key] =result
+                    break
+        else:
+            return json.dumps({'resp':'error'})
 
+        results['resp'] = 'success'
         scraper.quit_driver()
         return json.dumps(results)
 
@@ -43,9 +49,10 @@ def overall():
 def get_info():
     info = scraper.get_products()
     if not bool(info):
-        return
+        return 
     else:
         return json.dumps(info)
+
 
 @app.route('/getCSVFile',methods=['GET'])
 def csv():
@@ -54,6 +61,12 @@ def csv():
     output.headers["Content-Disposition"] = "attachment; filename=results.csv"
     output.headers["Content-type"] = "text/csv"
     return output
+
+@app.route('/reset_app',methods= ['GET'])
+def reset_app():
+    outcome = scraper.reset()
+    return {'outcome':outcome}
+
 
 if __name__ == '__main__':
   app.run(host='127.0.0.1', port=8000, debug=True)

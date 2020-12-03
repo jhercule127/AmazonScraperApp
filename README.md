@@ -17,18 +17,7 @@
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-
-
-<!-- PROJECT LOGO -->
 <br />
-<p align="center">
-
-  <p align="center">
-    Welcome to the Amazon Web Scraper
-  </p>
-</p>
-
-
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
@@ -60,14 +49,15 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-There are many great README templates available on GitHub, however, I didn't find one that really suit my needs so I created this enhanced one. I want to create a README template so amazing that it'll be the last one you ever need -- I think this is it.
+This project was a beginner/intermediate project that I took on personally to learn about web scraping and a bit about JavaScript. I figured one of the best ways would be scraping a website that I often visit - Amazon.com. I found many blockers that such as User-Agents, but ultimately the application functioned properly as expected.
 
-Here's why:
-* Your time should be focused on creating something amazing. A project that solves a problem and helps others
-* You shouldn't be doing the same tasks over and over like creating a README from scratch
-* You should element DRY principles to the rest of your life :smile:
+The web application takes two inputs:
+* Your budget you have to spend
+* List of URLs of Amazon products you wish to purchase
 
-Of course, no one template will serve all projects since your needs may be different. So I'll be adding more in the near future. You may also suggest changes by forking this repo and creating a pull request or opening an issue. Thanks to all the people have have contributed to expanding this template!
+Of course, some products are more diffficult to parse so at the moment only 'In stock' prodcucts can be scraped and only ones bought in US Dollars. After crawling and getting the necessary information the web app will output the results of the products you can purchase and how much you are left with. An extra feature that I will looking to add is setting a reminder (given certain settings) to notify someone when a low price is found.
+
+Obsviously, the extra feature would not be bombarding someone with hundreds of emails, but instead will run temporarily to at a set interval.
 
 A list of commonly used resources that I find helpful are listed in the acknowledgements.
 

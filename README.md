@@ -40,7 +40,7 @@ The web application takes two inputs:
 
 Of course, some products are more diffficult to parse so at the moment only 'In stock' prodcucts can be scraped and only ones bought in US Dollars. After crawling and getting the necessary information the web app will output the results of the products you can purchase and how much you are left with. An extra feature that I will looking to add is setting a reminder (given certain settings) to notify someone when a low price is found.
 
-Obsviously, the extra feature would not be bombarding someone with hundreds of emails, but instead will run temporarily to at a set interval.
+Obviously, the extra feature would not be bombarding someone with hundreds of emails, but instead will run temporarily at a set interval. In addition, the person can extract the information to a seperate CSV file.
 
 A list of commonly used resources that I find helpful are listed in the acknowledgements.
 
@@ -48,8 +48,8 @@ A list of commonly used resources that I find helpful are listed in the acknowle
 
 This section should list any major frameworks that you built your project using. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
 * [Bootstrap](https://getbootstrap.com)
-* [JavaScript](https://jquery.com)
-* [Python](https://laravel.com)
+* [JavaScript](https://www.javascript.com)
+* [Python](https://www.python.org)
 
 
 
@@ -93,12 +93,6 @@ Project Link: [https://github.com/your_username/repo_name](https://github.com/yo
 * [Img Shields](https://shields.io)
 * [Choose an Open Source License](https://choosealicense.com)
 * [GitHub Pages](https://pages.github.com)
-* [Animate.css](https://daneden.github.io/animate.css)
-* [Loaders.css](https://connoratherton.com/loaders)
-* [Slick Carousel](https://kenwheeler.github.io/slick)
-* [Smooth Scroll](https://github.com/cferdinandi/smooth-scroll)
-* [Sticky Kit](http://leafo.net/sticky-kit)
-* [JVectorMap](http://jvectormap.com)
 * [Font Awesome](https://fontawesome.com)
 
 
